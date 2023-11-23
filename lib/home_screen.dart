@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:image_editor/main_app_bar.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  XFile? image;
 
   @override
   Widget build(BuildContext context) {
@@ -10,6 +20,7 @@ class HomeScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
+          renderBody(),
           Positioned(
             top: 0,
             left: 0,
@@ -20,13 +31,41 @@ class HomeScreen extends StatelessWidget {
           onDeleteItem: onDeleteImage,
               ),
             )
-          )
         ],
       ),
     );
   }
 
-  void onPickImage(){}
+  Widget renderBody() {
+    if (image != null) {
+      return Positioned.fill(
+          child: InteractiveViewer(
+            child: Image.file(
+              File(image!.path),
+              fit: BoxFit.cover,
+            )
+          )
+      );
+    } else {
+      return Center(
+        child: TextButton(
+            style: TextButton.styleFrom(
+              primary: Colors.grey
+            ),
+            onPressed: onPickImage,
+            child: Text('이미지 선택하기'),
+          ),
+        );
+    }
+  }
+
+  void onPickImage() async{
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      this.image = image;
+    });
+  }
 
   void onSaveImage(){}
 
